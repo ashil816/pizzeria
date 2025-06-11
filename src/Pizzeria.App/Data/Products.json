@@ -1,0 +1,102 @@
+[
+  {
+    "ProductId": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+    "ProductName": "PZ001",
+    "Price": 12.99
+  },
+  {
+    "ProductId": "bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb",
+    "ProductName": "PZ002",
+    "Price": 15.99
+  },
+  {
+    "ProductId": "cccccccc-cccc-cccc-cccc-cccccccccccc",
+    "ProductName": "PZ003",
+    "Price": 18.99
+  },
+  {
+    "ProductId": "dddddddd-dddd-dddd-dddd-dddddddddddd",
+    "ProductName": "PZ004",
+    "Price": 14.99
+  },
+  {
+    "ProductId": "eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee",
+    "ProductName": "PZ005",
+    "Price": 16.99
+  },
+  {
+    "ProductId": "ffffffff-ffff-ffff-ffff-ffffffffffff",
+    "ProductName": "PZ006",
+    "Price": 13.99
+  },
+  {
+    "ProductId": "11111111-2222-3333-4444-555555555555",
+    "ProductName": "PZ007",
+    "Price": 19.99
+  },
+  {
+    "ProductId": "66666666-7777-8888-9999-000000000000",
+    "ProductName": "PZ008",
+    "Price": 17.99
+  },
+  {
+    "ProductId": "99999999-8888-7777-6666-555555555555",
+    "ProductName": "PZ009",
+    "Price": 11.99
+  },
+  {
+    "ProductId": "22222222-3333-4444-5555-666666666666",
+    "ProductName": "PZ010",
+    "Price": 20.99
+  },
+  {
+    "ProductId": "abcdefab-cdef-abcd-efab-cdefabcdefab",
+    "ProductName": "PZ011",
+    "Price": 22.99
+  },
+  {
+    "ProductId": "12345678-9abc-def0-1234-56789abcdef0",
+    "ProductName": "PZ012",
+    "Price": 10.99
+  },
+  {
+    "ProductId": "fedcba98-7654-3210-fedc-ba9876543210",
+    "ProductName": "PZ013",
+    "Price": 24.99
+  },
+  {
+    "ProductId": "87654321-abcd-ef01-2345-6789abcdef01",
+    "ProductName": "PZ014",
+    "Price": 9.99
+  },
+  {
+    "ProductId": "abcd1234-5678-90ab-cdef-1234567890ab",
+    "ProductName": "PZ015",
+    "Price": 21.99
+  },
+  {
+    "ProductId": "5a5a5a5a-5a5a-5a5a-5a5a-5a5a5a5a5a5a",
+    "ProductName": "PZ016",
+    "Price": 8.99
+  },
+  {
+    "ProductId": "b0b0b0b0-b0b0-b0b0-b0b0-b0b0b0b0b0b0",
+    "ProductName": "PZ017",
+    "Price": 23.99
+  },
+  {
+    "ProductId": "c1c1c1c1-c1c1-c1c1-c1c1-c1c1c1c1c1c1",
+    "ProductName": "PZ018",
+    "Price": 15.49
+  },
+  {
+    "ProductId": "d2d2d2d2-d2d2-d2d2-d2d2-d2d2d2d2d2d2",
+    "ProductName": "PZ019",
+    "Price": 18.49
+  },
+  {
+    "ProductId": "e3e3e3e3-e3e3-e3e3-e3e3-e3e3e3e3e3e3",
+    "ProductName": "PZ020",
+    "Price": 12.49
+  }
+]

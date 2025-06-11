@@ -2,7 +2,7 @@
   {
     "OrderId": "11111111-1111-1111-1111-111111111111",
     "ProductId": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
-    "Quantity": 2,
+    "Quantity": -2,
     "DeliveryAt": "2025-06-12T12:00:00",
     "CreatedAt": "2025-06-11T10:00:00",
     "DeliveryAddress": "123 Main St"

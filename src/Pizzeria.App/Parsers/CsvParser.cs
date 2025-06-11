@@ -14,8 +14,8 @@ public class CsvParser : IOrderParser
     {
         _config = new CsvConfiguration(CultureInfo.InvariantCulture)
         {
-            HasHeaderRecord  = true,
-            TrimOptions      = TrimOptions.Trim,
+            HasHeaderRecord = true,
+            TrimOptions = TrimOptions.Trim,
             IgnoreBlankLines = true,
         };
     }

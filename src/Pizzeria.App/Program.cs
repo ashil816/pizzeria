@@ -4,11 +4,14 @@ using Microsoft.Extensions.Logging;
 using Pizzeria.App.Interfaces;
 using Pizzeria.App.Parsers;
 using Pizzeria.App.Services;
+using Pizzeria.App.Validators;
 
 HostApplicationBuilder builder = Host.CreateApplicationBuilder(args);
 
-builder.Services.AddSingleton<IOrderParserFactory, OrderParserFactory>();
-builder.Services.AddSingleton<IOrderService, OrderService>();
+builder.Services
+    .AddSingleton<IOrderParserFactory, OrderParserFactory>()
+    .AddSingleton<IOrderService, OrderService>()
+    .AddSingleton<IOrderValidator, OrderValidator>();
 
 using var host = builder.Build();
 
@@ -29,7 +32,6 @@ string filePath = args[0];
 try
 {
     var orders = await orderService.GetOrdersAsync(filePath);
-    logger.LogInformation("Successfully processed {count} orders from {filePath}.", orders.Count(), filePath);
 }
 catch (Exception ex)
 {
