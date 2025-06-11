@@ -1,0 +1,23 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": ".NET 9 Console App",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build",
+            "program": "${workspaceFolder}/src/Pizzeria.App/bin/Debug/net9.0/Pizzeria.App.dll",
+            "args": [
+                "/Users/omid/Documents/Udemy/quiz/pizzaria/pizzeria/src/Pizzeria.App/Data/orders.csv"
+            ],
+            "cwd": "${workspaceFolder}/src/Pizzeria.App",
+            "stopAtEntry": false,
+            "console": "integratedTerminal"
+        }
+
+
+    ]
+}
