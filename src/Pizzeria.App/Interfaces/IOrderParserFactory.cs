@@ -2,5 +2,5 @@ namespace Pizzeria.App.Interfaces;
 
 public interface IOrderParserFactory
 {
-    IOrderParser GetParser(string filePath);
+    IOrderParser<T> GetParser<T>(string filePath);
 }

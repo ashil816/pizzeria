@@ -2,11 +2,10 @@ using System.Globalization;
 using CsvHelper;
 using CsvHelper.Configuration;
 using Pizzeria.App.Interfaces;
-using Pizzeria.App.Models;
 
 namespace Pizzeria.App.Parsers;
 
-public class CsvParser : IOrderParser
+public class CsvParser<T> : IOrderParser<T>
 {
     private readonly CsvConfiguration _config;
 
@@ -19,18 +18,18 @@ public class CsvParser : IOrderParser
             IgnoreBlankLines = true,
         };
     }
-    public async Task<IEnumerable<OrderItem>> ParseAsync(string filePath)
+    public async Task<IEnumerable<T>> ParseAsync(string filePath)
     {
-        var orders = new List<OrderItem>();
+        var items = new List<T>();
         await using var stream = File.OpenRead(filePath);
         using var reader = new StreamReader(stream);
         using var csv = new CsvReader(reader, _config);
 
-        await foreach (var record in csv.GetRecordsAsync<OrderItem>())
+        await foreach (var record in csv.GetRecordsAsync<T>())
         {
-            orders.Add(record);
+            items.Add(record);
         }
 
-        return orders;
+        return items;
     }
 }

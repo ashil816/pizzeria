@@ -31,15 +31,10 @@ string filePath = args[0];
 
 try
 {
-    var orders = await orderService.GetOrdersAsync(filePath);
+    var validOrders = await orderService.GetOrdersAsync(filePath);
+    await orderService.CalculateOrderPriceAsync(validOrders);
 }
 catch (Exception ex)
 {
     logger.LogError(ex, "An error occurred while processing the orders.");
 }
-finally
-{
-    await host.StopAsync();
-}
-
-await host.RunAsync();

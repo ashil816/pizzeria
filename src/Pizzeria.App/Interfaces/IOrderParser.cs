@@ -1,9 +1,8 @@
 using System;
-using Pizzeria.App.Models;
 
 namespace Pizzeria.App.Interfaces;
 
-public interface IOrderParser
+public interface IOrderParser<T>
 {
-    Task<IEnumerable<OrderItem>> ParseAsync(string filePath);
+    Task<IEnumerable<T>> ParseAsync(string filePath);
 }
