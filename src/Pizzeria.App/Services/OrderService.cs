@@ -1,6 +1,7 @@
 using Microsoft.Extensions.Logging;
 using Pizzeria.App.Interfaces;
 using Pizzeria.App.Models;
+using Pizzeria.App.Utils;
 
 namespace Pizzeria.App.Services;
 
@@ -28,7 +29,7 @@ public class OrderService(IOrderParserFactory parserFactory, IOrderValidator ord
     {
 
         var products = await LoadProductsAsync(filePath);
-        var orderPrices = CalculateOrderPricesInternal(orders, products);
+        var orderPrices = OrderUtils.CalculateOrderPrices(orders, products);
 
         foreach (var orderPrice in orderPrices)
         {
@@ -48,32 +49,12 @@ public class OrderService(IOrderParserFactory parserFactory, IOrderValidator ord
     public async Task CalculateIngredientsAmountAsync(IEnumerable<OrderItem> orders, string filePath)
     {
         var ingredients = await LoadIngredientsAsync(filePath);
-        var totalIngredients = new Dictionary<string, Ingredient>();
+        var (totalIngredients, missingProducts) = OrderUtils.CalculateIngredientsAmount(orders, ingredients);
 
-        foreach (var order in orders)
+        foreach (var (orderId, productId) in missingProducts)
         {
-            if (ingredients.TryGetValue(order.ProductId, out var productIngredients))
-            {
-                foreach (var ingredient in productIngredients.Ingredients)
-                {
-                    var key = $"{ingredient.Name}_{ingredient.Unit}";
-                    var totalAmount = ingredient.Amount * order.Quantity;
-
-                    if (totalIngredients.TryGetValue(key, out var existingIngredient))
-                    {
-                        totalIngredients[key] = existingIngredient with { Amount = existingIngredient.Amount + totalAmount };
-                    }
-                    else
-                    {
-                        totalIngredients[key] = new Ingredient(ingredient.Name, totalAmount, ingredient.Unit);
-                    }
-                }
-            }
-            else
-            {
-                logger.LogWarning("Product {ProductId} not found in ingredients file for Order {OrderId}",
-                    order.ProductId, order.OrderId);
-            }
+            logger.LogWarning("Product {ProductId} not found in ingredients file for Order {OrderId}",
+                productId, orderId);
         }
 
         logger.LogInformation("Total ingredients required for all orders:");
@@ -85,73 +66,28 @@ public class OrderService(IOrderParserFactory parserFactory, IOrderValidator ord
 
     private async Task<Dictionary<Guid, ProductIngredients>> LoadIngredientsAsync(string ingredientsFilePath)
     {
-        if (!File.Exists(ingredientsFilePath))
-        {
-            logger.LogError("Ingredients file not found at {IngredientsFile}", ingredientsFilePath);
-            throw new FileNotFoundException($"Ingredients file not found at {ingredientsFilePath}");
-        }
-
-        var parser = parserFactory.GetParser<ProductIngredients>(ingredientsFilePath);
-        var ingredients = await parser.ParseAsync(ingredientsFilePath);
-
-        var ingredientsDictionary = ingredients.ToDictionary(i => i.ProductId, i => i);
-        logger.LogInformation("Loaded {Count} ingredients from {IngredientsFile}.", ingredientsDictionary.Count, ingredientsFilePath);
-
-        return ingredientsDictionary;
+        return await LoadDataAsync<ProductIngredients>(ingredientsFilePath, "Ingredients", "ingredients");
     }
+
     private async Task<Dictionary<Guid, Product>> LoadProductsAsync(string productsFilePath)
     {
-
-        if (!File.Exists(productsFilePath))
-        {
-            logger.LogError("Products file not found at {ProductsFile}", productsFilePath);
-            throw new FileNotFoundException($"Products file not found at {productsFilePath}");
-        }
-
-        var parser = parserFactory.GetParser<Product>(productsFilePath);
-        var products = await parser.ParseAsync(productsFilePath);
-
-        var productsDictionary = products.ToDictionary(p => p.ProductId, p => p);
-        logger.LogInformation("Loaded {Count} products from {ProductsFile}.", productsDictionary.Count, productsFilePath);
-
-        return productsDictionary;
-
+        return await LoadDataAsync<Product>(productsFilePath, "Products", "products");
     }
 
-    private static List<OrderPriceCalculation> CalculateOrderPricesInternal(
-        IEnumerable<OrderItem> orders,
-        Dictionary<Guid, Product> products)
+    private async Task<Dictionary<Guid, T>> LoadDataAsync<T>(string filePath, string entityTypeName, string logName) where T : class, IHasProductId
     {
-        var orderPrices = new List<OrderPriceCalculation>();
-        var orderGroups = orders.GroupBy(o => o.OrderId);
-
-        foreach (var group in orderGroups)
+        if (!File.Exists(filePath))
         {
-            decimal totalPrice = 0;
-            var missingProducts = new List<Guid>();
-
-            foreach (var order in group)
-            {
-                if (products.TryGetValue(order.ProductId, out var product))
-                {
-                    totalPrice += product.Price * order.Quantity;
-                }
-                else
-                {
-                    missingProducts.Add(order.ProductId);
-                }
-            }
-
-            var calculation = new OrderPriceCalculation(
-                group.Key,
-                group.Count(),
-                totalPrice,
-                missingProducts
-            );
-
-            orderPrices.Add(calculation);
+            logger.LogError("{EntityType} file not found at {FilePath}", entityTypeName, filePath);
+            throw new FileNotFoundException($"{entityTypeName} file not found at {filePath}");
         }
 
-        return orderPrices;
+        var parser = parserFactory.GetParser<T>(filePath);
+        var items = await parser.ParseAsync(filePath);
+
+        var dictionary = items.ToDictionary(item => item.ProductId, item => item);
+        logger.LogInformation("Loaded {Count} {LogName} from {FilePath}.", dictionary.Count, logName, filePath);
+
+        return dictionary;
     }
 }
