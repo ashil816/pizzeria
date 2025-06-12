@@ -45,6 +45,60 @@ public class OrderService(IOrderParserFactory parserFactory, IOrderValidator ord
         }
     }
 
+    public async Task CalculateIngredientsAmountAsync(IEnumerable<OrderItem> orders, string filePath)
+    {
+        var ingredients = await LoadIngredientsAsync(filePath);
+        var totalIngredients = new Dictionary<string, Ingredient>();
+
+        foreach (var order in orders)
+        {
+            if (ingredients.TryGetValue(order.ProductId, out var productIngredients))
+            {
+                foreach (var ingredient in productIngredients.Ingredients)
+                {
+                    var key = $"{ingredient.Name}_{ingredient.Unit}";
+                    var totalAmount = ingredient.Amount * order.Quantity;
+
+                    if (totalIngredients.TryGetValue(key, out var existingIngredient))
+                    {
+                        totalIngredients[key] = existingIngredient with { Amount = existingIngredient.Amount + totalAmount };
+                    }
+                    else
+                    {
+                        totalIngredients[key] = new Ingredient(ingredient.Name, totalAmount, ingredient.Unit);
+                    }
+                }
+            }
+            else
+            {
+                logger.LogWarning("Product {ProductId} not found in ingredients file for Order {OrderId}",
+                    order.ProductId, order.OrderId);
+            }
+        }
+
+        logger.LogInformation("Total ingredients required for all orders:");
+        foreach (var ingredient in totalIngredients.Values.OrderBy(i => i.Name))
+        {
+            logger.LogInformation("{Name}: {Amount} {Unit}", ingredient.Name, ingredient.Amount, ingredient.Unit);
+        }
+    }
+
+    private async Task<Dictionary<Guid, ProductIngredients>> LoadIngredientsAsync(string ingredientsFilePath)
+    {
+        if (!File.Exists(ingredientsFilePath))
+        {
+            logger.LogError("Ingredients file not found at {IngredientsFile}", ingredientsFilePath);
+            throw new FileNotFoundException($"Ingredients file not found at {ingredientsFilePath}");
+        }
+
+        var parser = parserFactory.GetParser<ProductIngredients>(ingredientsFilePath);
+        var ingredients = await parser.ParseAsync(ingredientsFilePath);
+
+        var ingredientsDictionary = ingredients.ToDictionary(i => i.ProductId, i => i);
+        logger.LogInformation("Loaded {Count} ingredients from {IngredientsFile}.", ingredientsDictionary.Count, ingredientsFilePath);
+
+        return ingredientsDictionary;
+    }
     private async Task<Dictionary<Guid, Product>> LoadProductsAsync(string productsFilePath)
     {
 
