@@ -12,7 +12,7 @@ public partial class OrderServiceTests
     public async Task GetOrdersAsync_WhenValidFileWithMultipleOrders_ReturnsValidatedOrders()
     {
         // Arrange
-        var filePath = GetTestDataPath("valid-orders.json");
+        var filePath = GetTestDataPath("orders.json");
         var parsedOrders = _fixture.CreateMany<OrderItem>(3).ToList();
         var validatedOrders = _fixture.CreateMany<OrderItem>(2).ToList();
 
@@ -50,7 +50,7 @@ public partial class OrderServiceTests
     public async Task GetOrdersAsync_WhenValidFileButValidationFiltersOutSomeOrders_ReturnsOnlyValidOrders()
     {
         // Arrange
-        var filePath = GetTestDataPath("valid-orders.json");
+        var filePath = GetTestDataPath("orders.json");
         var parsedOrders = _fixture.CreateMany<OrderItem>(5).ToList();
         var validOrder = _fixture.Create<OrderItem>();
         var validatedOrders = new List<OrderItem> { validOrder };
@@ -92,7 +92,7 @@ public partial class OrderServiceTests
         Exception parseException)
     {
         // Arrange
-        var filePath = GetTestDataPath("valid-orders.json");
+        var filePath = GetTestDataPath("orders.json");
         _mockParserFactory.GetParser<OrderItem>(filePath).Returns(_mockParser);
         _mockParser.ParseAsync(filePath).Returns(Task.FromException<IEnumerable<OrderItem>>(parseException));
 
@@ -108,7 +108,7 @@ public partial class OrderServiceTests
     public async Task GetOrdersAsync_WhenLargeFile_ProcessesAllOrders()
     {
         // Arrange
-        var filePath = GetTestDataPath("valid-orders.json");
+        var filePath = GetTestDataPath("orders.json");
         var largeOrderSet = _fixture.CreateMany<OrderItem>(1000).ToList();
 
         _mockParserFactory.GetParser<OrderItem>(filePath).Returns(_mockParser);
@@ -128,7 +128,7 @@ public partial class OrderServiceTests
     public async Task GetOrdersAsync_WhenJsonFile_CallsCorrectParser()
     {
         // Arrange
-        var jsonFilePath = GetTestDataPath("valid-orders.json");
+        var jsonFilePath = GetTestDataPath("orders.json");
         var orders = _fixture.CreateMany<OrderItem>(2).ToList();
 
         _mockParserFactory.GetParser<OrderItem>(jsonFilePath).Returns(_mockParser);
@@ -146,7 +146,7 @@ public partial class OrderServiceTests
     public async Task GetOrdersAsync_WhenCsvFile_CallsCorrectParser()
     {
         // Arrange
-        var csvFilePath = GetTestDataPath("valid-orders.csv");
+        var csvFilePath = GetTestDataPath("orders.csv");
         var orders = _fixture.CreateMany<OrderItem>(2).ToList();
 
         _mockParserFactory.GetParser<OrderItem>(csvFilePath).Returns(_mockParser);
@@ -164,7 +164,7 @@ public partial class OrderServiceTests
     public async Task GetOrdersAsync_WhenAllOrdersFilteredOut_ReturnsEmptyCollection()
     {
         // Arrange
-        var filePath = GetTestDataPath("valid-orders.json");
+        var filePath = GetTestDataPath("orders.json");
         var parsedOrders = _fixture.CreateMany<OrderItem>(5).ToList();
         var emptyValidatedOrders = new List<OrderItem>();
 
