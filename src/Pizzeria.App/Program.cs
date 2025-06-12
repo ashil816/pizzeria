@@ -22,17 +22,18 @@ var services = scope.ServiceProvider;
 var orderService = services.GetRequiredService<IOrderService>();
 var logger = services.GetRequiredService<ILogger<Program>>();
 
-if (args.Length == 0)
+if (args.Length != 2)
 {
     logger.LogError("No file path provided. Please specify the path to the order file.");
     return;
 }
-string filePath = args[0];
+string ordersFilePath = args[0];
+string productsFilePath = args[1];
 
 try
 {
-    var validOrders = await orderService.GetOrdersAsync(filePath);
-    await orderService.CalculateOrderPriceAsync(validOrders);
+    var validOrders = await orderService.GetOrdersAsync(ordersFilePath);
+    await orderService.CalculateOrderPriceAsync(validOrders, productsFilePath);
 }
 catch (Exception ex)
 {

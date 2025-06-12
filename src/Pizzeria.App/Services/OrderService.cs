@@ -24,30 +24,80 @@ public class OrderService(IOrderParserFactory parserFactory, IOrderValidator ord
         return validOrders;
     }
 
-    public async Task CalculateOrderPriceAsync(IEnumerable<OrderItem> orders)
+    public async Task CalculateOrderPriceAsync(IEnumerable<OrderItem> orders, string filePath)
     {
-        // get Products.jason in Data folder and parse it
-        var filePath = Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "Data", "Products.json");
-        var parser = parserFactory.GetParser<Product>(filePath);
-        var products = await parser.ParseAsync(filePath);
 
-        var orderGroups = orders.GroupBy(o => o.OrderId);
-        foreach (var group in orderGroups)
+        var products = await LoadProductsAsync(filePath);
+        var orderPrices = CalculateOrderPricesInternal(orders, products);
+
+        foreach (var orderPrice in orderPrices)
         {
-            logger.LogInformation("Order ID: {OrderId} with {Count} items.", group.Key, group.Count());
-            decimal totalPrice = 0;
-            foreach (var order in group)
+            logger.LogInformation("Order ID: {OrderId} with {Count} items.", orderPrice.OrderId, orderPrice.ItemCount);
+
+            if (orderPrice.MissingProductIds.Count > 0)
             {
-                var product = products.FirstOrDefault(p => p.ProductId == order.ProductId);
-                if (product == null)
-                {
-                    logger.LogWarning("Product with ID {ProductId} not found in products list.", order.ProductId);
-                    continue;
-                }
-                totalPrice += product.Price * order.Quantity;
+                logger.LogWarning("Order ID {OrderId} has {Count} missing products: {MissingProducts}",
+                    orderPrice.OrderId, orderPrice.MissingProductIds.Count,
+                    string.Join(", ", orderPrice.MissingProductIds));
             }
-            logger.LogInformation("Total price for Order ID {OrderId}: {TotalPrice}.", group.Key, totalPrice);
+
+            logger.LogInformation("Total price for Order ID {OrderId}: {TotalPrice}.", orderPrice.OrderId, orderPrice.TotalPrice);
+        }
+    }
+
+    private async Task<Dictionary<Guid, Product>> LoadProductsAsync(string productsFilePath)
+    {
+
+        if (!File.Exists(productsFilePath))
+        {
+            logger.LogError("Products file not found at {ProductsFile}", productsFilePath);
+            throw new FileNotFoundException($"Products file not found at {productsFilePath}");
         }
 
+        var parser = parserFactory.GetParser<Product>(productsFilePath);
+        var products = await parser.ParseAsync(productsFilePath);
+
+        var productsDictionary = products.ToDictionary(p => p.ProductId, p => p);
+        logger.LogInformation("Loaded {Count} products from {ProductsFile}.", productsDictionary.Count, productsFilePath);
+
+        return productsDictionary;
+
+    }
+
+    private static List<OrderPriceCalculation> CalculateOrderPricesInternal(
+        IEnumerable<OrderItem> orders,
+        Dictionary<Guid, Product> products)
+    {
+        var orderPrices = new List<OrderPriceCalculation>();
+        var orderGroups = orders.GroupBy(o => o.OrderId);
+
+        foreach (var group in orderGroups)
+        {
+            decimal totalPrice = 0;
+            var missingProducts = new List<Guid>();
+
+            foreach (var order in group)
+            {
+                if (products.TryGetValue(order.ProductId, out var product))
+                {
+                    totalPrice += product.Price * order.Quantity;
+                }
+                else
+                {
+                    missingProducts.Add(order.ProductId);
+                }
+            }
+
+            var calculation = new OrderPriceCalculation(
+                group.Key,
+                group.Count(),
+                totalPrice,
+                missingProducts
+            );
+
+            orderPrices.Add(calculation);
+        }
+
+        return orderPrices;
     }
 }

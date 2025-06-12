@@ -11,7 +11,8 @@
             "preLaunchTask": "build",
             "program": "${workspaceFolder}/src/Pizzeria.App/bin/Debug/net9.0/Pizzeria.App.dll",
             "args": [
-                "/Users/omid/Documents/Udemy/quiz/pizzaria/pizzeria/src/Pizzeria.App/Data/orders.json"
+                "/Users/omid/Documents/Udemy/quiz/pizzaria/pizzeria/src/Pizzeria.App/Data/orders.json",
+                "/Users/omid/Documents/Udemy/quiz/pizzaria/pizzeria/src/Pizzeria.App/Data/products.json"
             ],
             "cwd": "${workspaceFolder}/src/Pizzeria.App",
             "stopAtEntry": false,
