@@ -29,13 +29,13 @@ if (args.Length != 3)
 }
 string ordersFilePath = args[0];
 string productsFilePath = args[1];
-string IngredientsFilePath = args[2];
+string ingredientsFilePath = args[2];
 
 try
 {
     var validOrders = await orderService.GetOrdersAsync(ordersFilePath);
     await orderService.CalculateOrderPriceAsync(validOrders, productsFilePath);
-    await orderService.CalculateIngredientsAmountAsync(validOrders, IngredientsFilePath);
+    await orderService.CalculateIngredientsAmountAsync(validOrders, ingredientsFilePath);
 }
 catch (Exception ex)
 {
