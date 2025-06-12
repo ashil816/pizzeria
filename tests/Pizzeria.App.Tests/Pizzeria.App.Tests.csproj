@@ -27,4 +27,8 @@
     <ProjectReference Include="..\..\src\Pizzeria.App\Pizzeria.App.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Include="TestData\**\*" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
 </Project>
