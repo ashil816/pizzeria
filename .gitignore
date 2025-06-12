@@ -9,6 +9,9 @@ obj/
 !.vscode/launch.json
 !.vscode/extensions.json
 
+# SonarQube
+.sonarqube/*
+
 # Visual Studio Code workspace specific files
 *.code-workspace
 
